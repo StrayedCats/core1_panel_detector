@@ -1,0 +1,5 @@
+<library path="core1_panel_detector_plugin">
+    <class type="detector2d_plugins::PanelDetectorHsv" base_class_type="detector2d_base::Detector">
+        <description>core1_panel_detector_plugin</description>
+    </class>
+</library>
