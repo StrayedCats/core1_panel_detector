@@ -44,7 +44,7 @@ Detection2DArray PanelDetectorHsv::detect(const cv::Mat & image)
   auto img = image.clone();
   auto objects = hsv->detect(img);
 
-  if (this->params_.yolox_trt_plugin.imshow_isshow) {
+  if (this->params_.debug) {
     auto detected_img = img.clone();
     for (auto obj : objects) {
       cv::rectangle(detected_img, cv::Point(obj.x, obj.y), cv::Point(obj.x + obj.w, obj.y + obj.h), cv::Scalar(0, 255, 0), 2);
@@ -80,7 +80,6 @@ Detection2DArray PanelDetectorHsv::objects_to_detection2d_array(
 
     boxes.detections.push_back(detection);
   }
-
   return boxes;
 }
 

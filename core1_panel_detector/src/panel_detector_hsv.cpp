@@ -18,10 +18,12 @@
 namespace core1_panel_detector
 {
 
-PanelDetectorHsv::PanelDetectorHsv(int hue_min, int hue_max, int sat_min, int sat_max, int val_min, int val_max)
+PanelDetectorHsv::PanelDetectorHsv(
+    const int hue_min, const int hue_max, const int sat_min,
+    const int sat_max, const int val_min, const int val_max)
     : hue_min(hue_min), hue_max(hue_max), sat_min(sat_min), sat_max(sat_max), val_min(val_min), val_max(val_max) {}
 
-cv::Mat PanelDetectorHsv::hsv_filter(cv::Mat& img) {
+cv::Mat PanelDetectorHsv::hsv_filter(const cv::Mat& img) {
     cv::Mat img_hsv;
     cv::cvtColor(img, img_hsv, cv::COLOR_BGR2HSV);
     cv::Scalar lower(hue_min, sat_min, val_min);
@@ -33,7 +35,7 @@ cv::Mat PanelDetectorHsv::hsv_filter(cv::Mat& img) {
     return result;
 }
 
-std::vector<Bbox> PanelDetectorHsv::detect(cv::Mat& img) {
+std::vector<Bbox> PanelDetectorHsv::detect(const cv::Mat& img) {
     cv::Mat img_filtered = hsv_filter(img);
     cv::Mat img_gray;
     cv::cvtColor(img_filtered, img_gray, cv::COLOR_BGR2GRAY);
@@ -44,38 +46,39 @@ std::vector<Bbox> PanelDetectorHsv::detect(cv::Mat& img) {
     std::vector<Bbox> bbox_list = create_bboxes(contours);
     std::vector<Bbox> merge_contours;
     while (bbox_list.size() > 0) {
-        Bbox result = find_nearby_contours(bbox_list, 10, 10);
-        merge_contours.push_back(result);
+        // Bbox result = find_nearby_contours(bbox_list, 10, 10);
+        Bbox result(0, 0, 0, 0);  // TODO: fix this (not sure what the result is supposed to be, but it's not a Bbox object
+        auto rm_position = find_nearby_contours(bbox_list, 10, 10, result);
+        if (rm_position > 0) {
+            merge_contours.push_back(result);
+            bbox_list.erase(bbox_list.begin() + rm_position);
+        } else {
+            bbox_list.erase(bbox_list.begin());
+        }
     }
+    std::cout << "Detected " << merge_contours.size() << " panels" << std::endl;
     return merge_contours;
 }
 
-Bbox PanelDetectorHsv::find_nearby_contours(std::vector<Bbox>& bbox_list, int x_mergin, int y_mergin) {
-    Bbox box(0, 0, 0, 0);
-
+// Bbox PanelDetectorHsv::find_nearby_contours(const std::vector<Bbox>& bbox_list, const int x_mergin, const int y_mergin) {
+int PanelDetectorHsv::find_nearby_contours(const std::vector<Bbox>& bbox_list, const int x_mergin, const int y_mergin, Bbox& box) {
     if (bbox_list.size() == 1)
-        return bbox_list[0];
+        return 0;
 
-    for (size_t i = 0; i < bbox_list.size(); ++i) {
-        for (size_t j = i + 1; j < bbox_list.size(); ++j) {
-            if (std::abs(bbox_list[i].x - bbox_list[j].x) < x_mergin && std::abs(bbox_list[i].w - bbox_list[j].w) < y_mergin) {
-                box.x = std::min(bbox_list[i].x, bbox_list[j].x);
-                box.y = std::min(bbox_list[i].y, bbox_list[j].y);
-                box.w = std::max(bbox_list[i].w, bbox_list[j].w);
-                box.h = std::abs(bbox_list[i].y - bbox_list[j].y) + std::max(bbox_list[i].h, bbox_list[j].h);
-                bbox_list.erase(bbox_list.begin() + i);
-                bbox_list.erase(bbox_list.begin() + j - 1);
-                return box;
-            }
+    int i = 0;
+    for (size_t j = 1; j < bbox_list.size(); ++j) {
+        if (std::abs(bbox_list[i].x - bbox_list[j].x) < x_mergin && std::abs(bbox_list[i].w - bbox_list[j].w) < y_mergin) {
+            box.x = std::min(bbox_list[i].x, bbox_list[j].x);
+            box.y = std::min(bbox_list[i].y, bbox_list[j].y);
+            box.w = std::max(bbox_list[i].w, bbox_list[j].w);
+            box.h = std::abs(bbox_list[i].y - bbox_list[j].y) + std::max(bbox_list[i].h, bbox_list[j].h);
+            return j;
         }
-        bbox_list.erase(bbox_list.begin() + i - 1);
-        if (box.w != 0)
-            break;
     }
-    return box;
+    return 0;
 }
 
-std::vector<Bbox> PanelDetectorHsv::create_bboxes(std::vector<std::vector<cv::Point>>& contours) {
+std::vector<Bbox> PanelDetectorHsv::create_bboxes(const std::vector<std::vector<cv::Point>>& contours) {
     std::vector<Bbox> bbox_list;
     for (const auto& contour : contours) {
         cv::Rect rect = cv::boundingRect(contour);

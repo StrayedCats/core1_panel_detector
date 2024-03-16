@@ -38,13 +38,14 @@ class PanelDetectorHsv {
         int hue_min, hue_max, sat_min, sat_max, val_min, val_max;
 
     public:
-        PanelDetectorHsv(int, int, int, int, int, int);
+        PanelDetectorHsv(const int, const int, const int,
+                        const int, const int, const int);
 
-        cv::Mat hsv_filter(cv::Mat &);
-        std::vector<Bbox> detect(cv::Mat &);
+        cv::Mat hsv_filter(const cv::Mat &);
+        std::vector<Bbox> detect(const cv::Mat &);
 
-        Bbox find_nearby_contours(std::vector<Bbox> &, int, int);
-        std::vector<Bbox> create_bboxes(std::vector<std::vector<cv::Point>> &);
+        int find_nearby_contours(const std::vector<Bbox> &, const int, const int, Bbox &);
+        std::vector<Bbox> create_bboxes(const std::vector<std::vector<cv::Point>> &);
 };
 
 }  // namespace core1_panel_detector
