@@ -46,9 +46,8 @@ std::vector<Bbox> PanelDetectorHsv::detect(const cv::Mat& img) {
     std::vector<Bbox> bbox_list = create_bboxes(contours);
     std::vector<Bbox> merge_contours;
     while (bbox_list.size() > 0) {
-        // Bbox result = find_nearby_contours(bbox_list, 10, 10);
-        Bbox result(0, 0, 0, 0);  // TODO: fix this (not sure what the result is supposed to be, but it's not a Bbox object
-        auto rm_position = find_nearby_contours(bbox_list, 10, 10, result);
+        Bbox result(0, 0, 0, 0);
+        auto rm_position = find_nearby_contours(bbox_list, 10, result);
         if (rm_position > 0) {
             merge_contours.push_back(result);
             bbox_list.erase(bbox_list.begin() + rm_position);
@@ -60,14 +59,14 @@ std::vector<Bbox> PanelDetectorHsv::detect(const cv::Mat& img) {
     return merge_contours;
 }
 
-// Bbox PanelDetectorHsv::find_nearby_contours(const std::vector<Bbox>& bbox_list, const int x_mergin, const int y_mergin) {
-int PanelDetectorHsv::find_nearby_contours(const std::vector<Bbox>& bbox_list, const int x_mergin, const int y_mergin, Bbox& box) {
+int PanelDetectorHsv::find_nearby_contours(const std::vector<Bbox>& bbox_list, const int w_mergin, Bbox& box) {
     if (bbox_list.size() == 1)
         return 0;
 
     int i = 0;
     for (size_t j = 1; j < bbox_list.size(); ++j) {
-        if (std::abs(bbox_list[i].x - bbox_list[j].x) < x_mergin && std::abs(bbox_list[i].w - bbox_list[j].w) < y_mergin) {
+        auto x_mergin = (bbox_list[i].w + bbox_list[j].w) * 2 / 3;
+        if (std::abs(bbox_list[i].x - bbox_list[j].x) < x_mergin && std::abs(bbox_list[i].w - bbox_list[j].w) < w_mergin) {
             box.x = std::min(bbox_list[i].x, bbox_list[j].x);
             box.y = std::min(bbox_list[i].y, bbox_list[j].y);
             box.w = std::max(bbox_list[i].w, bbox_list[j].w);

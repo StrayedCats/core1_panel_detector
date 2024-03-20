@@ -44,7 +44,7 @@ class PanelDetectorHsv {
         cv::Mat hsv_filter(const cv::Mat &);
         std::vector<Bbox> detect(const cv::Mat &);
 
-        int find_nearby_contours(const std::vector<Bbox> &, const int, const int, Bbox &);
+        int find_nearby_contours(const std::vector<Bbox> &, const int, Bbox &);
         std::vector<Bbox> create_bboxes(const std::vector<std::vector<cv::Point>> &);
 };
 
