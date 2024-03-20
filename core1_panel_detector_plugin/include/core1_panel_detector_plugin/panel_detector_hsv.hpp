@@ -31,12 +31,13 @@ public:
   Detection2DArray detect(const cv::Mat &) override;
 
 private:
-  std::shared_ptr<core1_panel_detector::PanelDetectorHsv> hsv;
+  // std::shared_ptr<core1_panel_detector::PanelDetectorHsv> hsv;
+  std::vector<std::shared_ptr<core1_panel_detector::PanelDetectorHsv>> hsvs;
 
   Detection2DArray objects_to_detection2d_array(
-    const std::vector<core1_panel_detector::Bbox> & objects);
+    const std::vector<core1_panel_detector::Bbox> & objects,
+    const std::string label);
   detector2d_parameters::Params params_;
 
-  std::string label;
 };
 }
