@@ -55,7 +55,6 @@ std::vector<Bbox> PanelDetectorHsv::detect(const cv::Mat& img) {
             bbox_list.erase(bbox_list.begin());
         }
     }
-    std::cout << "Detected " << merge_contours.size() << " panels" << std::endl;
     return merge_contours;
 }
 
