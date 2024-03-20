@@ -21,16 +21,17 @@ void PanelDetectorHsv::init(const detector2d_parameters::ParamListener & param_l
 {
   params_ = param_listener.get_params();
 
-  int sat_min = 50, sat_max = 255, val_min = 50, val_max = 255;
+  int red_sat_min = 40, red_sat_max = 255, red_val_min = 40, red_val_max = 255;
+  int blue_sat_min = 40, blue_sat_max = 255, blue_val_min = 40, blue_val_max = 255;
   
   int32_t red_hue_min = 0;
-  int32_t red_hue_max = 10;
+  int32_t red_hue_max = 50;
 
   int32_t blue_hue_min = 80;
-  int32_t blue_hue_max = 150;
+  int32_t blue_hue_max = 130;
 
-  hsvs.push_back(std::make_shared<core1_panel_detector::PanelDetectorHsv>(red_hue_min, red_hue_max, sat_min, sat_max, val_min, val_max));
-  hsvs.push_back(std::make_shared<core1_panel_detector::PanelDetectorHsv>(blue_hue_min, blue_hue_max, sat_min, sat_max, val_min, val_max));
+  hsvs.push_back(std::make_shared<core1_panel_detector::PanelDetectorHsv>(red_hue_min, red_hue_max, red_sat_min, red_sat_max, red_val_min, red_val_max));
+  hsvs.push_back(std::make_shared<core1_panel_detector::PanelDetectorHsv>(blue_hue_min, blue_hue_max, blue_sat_min, blue_sat_max, blue_val_min, blue_val_max));
 }
 
 Detection2DArray PanelDetectorHsv::detect(const cv::Mat & image)

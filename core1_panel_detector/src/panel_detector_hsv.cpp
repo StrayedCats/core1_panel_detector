@@ -40,7 +40,7 @@ std::vector<Bbox> PanelDetectorHsv::detect(const cv::Mat& img) {
     cv::Mat img_gray;
     cv::cvtColor(img_filtered, img_gray, cv::COLOR_BGR2GRAY);
     cv::Mat img_thresh;
-    cv::threshold(img_gray, img_thresh, 127, 255, 0);
+    cv::threshold(img_gray, img_thresh, 100, 255, 0);
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(img_thresh, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
     std::vector<Bbox> bbox_list = create_bboxes(contours);
