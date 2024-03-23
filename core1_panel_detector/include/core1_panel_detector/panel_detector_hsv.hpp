@@ -40,7 +40,8 @@ class PanelDetectorHsv {
     public:
         PanelDetectorHsv(const int, const int, const int,
                         const int, const int, const int);
-
+        
+        cv::Mat mask(const cv::Mat &);
         cv::Mat hsv_filter(const cv::Mat &);
         std::vector<Bbox> detect(const cv::Mat &);
 
