@@ -35,8 +35,19 @@ cv::Mat PanelDetectorHsv::hsv_filter(const cv::Mat& img) {
     return result;
 }
 
+cv::Mat PanelDetectorHsv::mask(const cv::Mat& img) {
+  int mask_height = 250; //要調整
+  cv::Mat mask = cv::Mat::ones(img.size(), CV_8UC1) * 255; 
+  cv::Rect mask_roi(0, 0, img.cols, mask_height);
+  mask(mask_roi) = 0;
+  cv::Mat result;
+  img.copyTo(result, mask);
+  return result;
+}
+
 std::vector<Bbox> PanelDetectorHsv::detect(const cv::Mat& img) {
-    cv::Mat img_filtered = hsv_filter(img);
+    cv::Mat img_mask = mask(img);
+    cv::Mat img_filtered = hsv_filter(img_mask);
     cv::Mat img_gray;
     cv::cvtColor(img_filtered, img_gray, cv::COLOR_BGR2GRAY);
     cv::Mat img_thresh;
